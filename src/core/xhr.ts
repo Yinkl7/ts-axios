@@ -1,7 +1,7 @@
-import { AxiosRequestConfig, AxiosPromise, AxiosRespose } from './types'
+import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from '../types'
 
-import { parseHeader } from './helpers/header'
-import { time } from 'console'
+import { parseHeader } from '../helpers/header'
+import { createError } from '../helpers/error'
 
 function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
@@ -17,7 +17,7 @@ function xhr(config: AxiosRequestConfig): AxiosPromise {
       request.timeout = timeout
     }
 
-    request.open(method.toUpperCase(), url, true)
+    request.open(method.toUpperCase(), url!, true)
 
     request.onreadystatechange = function handleLoad() {
       if (request.readyState !== 4) {
@@ -30,7 +30,7 @@ function xhr(config: AxiosRequestConfig): AxiosPromise {
 
       const responseHeaders = parseHeader(request.getAllResponseHeaders())
       const responseData = responseType !== 'text' ? request.response : request.responseText
-      const response: AxiosRespose = {
+      const response: AxiosResponse = {
         data: responseData,
         headers: responseHeaders,
         status: request.status,
@@ -43,14 +43,15 @@ function xhr(config: AxiosRequestConfig): AxiosPromise {
 
     // 网络异常处理
     request.onerror = function handleError() {
-      reject(new Error('Network Error'))
+      reject(createError('Network Error', config, null, request))
     }
 
     // 请求超时处理
     request.ontimeout = function handleTimeout() {
-      reject(new Error(`Timeout of ${timeout} ms exceeded`))
+      reject(createError(`Timeout of ${timeout} ms exceeded`, config, 'ECONNABORTED', request))
     }
 
+    // 请求头设置
     Object.keys(headers).forEach(name => {
       if (data === null && name.toLowerCase() === 'content-type') {
         //  不存在data时 此时content-type无意义
@@ -62,11 +63,19 @@ function xhr(config: AxiosRequestConfig): AxiosPromise {
 
     request.send(data)
 
-    function handleResponse(response: AxiosRespose): void {
+    function handleResponse(response: AxiosResponse): void {
       if (response.status >= 200 && response.status < 300) {
         resolve(response)
       } else {
-        reject(new Error(`Request failed with status code ${response.status}`))
+        reject(
+          createError(
+            `Request failed with status code ${response.status}`,
+            config,
+            null,
+            request,
+            response
+          )
+        )
       }
     }
   })
