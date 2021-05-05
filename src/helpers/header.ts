@@ -6,7 +6,7 @@ function normalizeHeaderName(headers: any, normalizeName: string) {
     return
   }
   Object.keys(headers).forEach(name => {
-    if (name !== normalizeName && name.toUpperCase === normalizeName.toUpperCase) {
+    if (name !== normalizeName && name.toUpperCase() === normalizeName.toUpperCase()) {
       headers[normalizeName] = headers[name]
       delete headers[name]
     }
@@ -17,8 +17,8 @@ function normalizeHeaderName(headers: any, normalizeName: string) {
 export function processHeaders(headers: any, data: any): any {
   normalizeHeaderName(headers, 'Content-Type')
   if (isPlainObject(data)) {
-    // if (headers && !headers['Content-Type']) {
-    if (headers) {
+    if (headers && !headers['Content-Type']) {
+      // if (headers) {
       headers['Content-Type'] = 'application/json;charset=utf-8'
     }
   }
@@ -34,15 +34,13 @@ export function parseHeader(headers: string): any {
   }
 
   headers.split('\r\n').forEach(line => {
-    let [key, value] = line.split(':')
+    let [key, ...values] = line.split(':')
     key = key.trim().toLowerCase()
     // key为空时跳到下一次循环
     if (!key) {
       return
     }
-    if (value) {
-      value = value.trim()
-    }
+    const value = values.join(':').trim()
     parsed[key] = value
   })
 
