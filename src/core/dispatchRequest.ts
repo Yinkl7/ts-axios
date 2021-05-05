@@ -4,6 +4,7 @@ import { bulidURL } from '../helpers/url'
 import { transformRequest, transformResponse } from '../helpers/data'
 import { processHeaders } from '../helpers/header'
 
+// 生成一个request
 export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromise {
   processConfig(config)
   return xhr(config).then(res => {
