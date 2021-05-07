@@ -35,6 +35,8 @@ registerExtendRouter()
 
 registerInterceptorRouter()
 
+registerConfigRouter()
+
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -144,8 +146,13 @@ function registerExtendRouter() {
 
 function registerInterceptorRouter() {
   router.get('/interceptor/get', function (req, res) {
-    console.log(req.headers);
     res.end('hello')
+  })
+}
+
+function registerConfigRouter () {
+  router.post('/config/post', function(req, res) {
+    res.json(req.body)
   })
 }
 

@@ -53,7 +53,6 @@ function xhr(config: AxiosRequestConfig): AxiosPromise {
 
     // 请求头设置
     Object.keys(headers).forEach(name => {
-      console.log(name, headers[name])
       if (data === null && name.toLowerCase() === 'content-type') {
         //  不存在data时 此时content-type无意义
         delete headers[name]

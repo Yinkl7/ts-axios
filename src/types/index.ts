@@ -27,6 +27,8 @@ export interface AxiosRequestConfig {
   // 相应类型定义
   responseType?: XMLHttpRequestResponseType
   timeout?: number
+
+  [propName: string]: any
 }
 
 // 服务端返回数据类型定义
@@ -52,6 +54,8 @@ export interface AxiosError {
 export interface AxiosPromise<T = any> extends Promise<AxiosResponse<T>> {}
 
 export interface Axios {
+  defaults: AxiosRequestConfig
+
   interceptors: {
     request: AxiosInterceptorManager<AxiosRequestConfig>
     response: AxiosInterceptorManager<AxiosResponse>
