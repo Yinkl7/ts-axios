@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosResponse } from '../types/index'
+import { AxiosRequestConfig, AxiosResponse } from '../types'
 
 export class AxiosError extends Error {
   isAxiosError: boolean
@@ -31,7 +31,7 @@ export function createError(
   code?: string | null,
   request?: any,
   response?: AxiosResponse
-) {
+): AxiosError {
   const error = new AxiosError(message, config, code, request, response)
 
   return error

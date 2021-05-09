@@ -1,11 +1,10 @@
 import {
-  AxiosPromise,
   AxiosRequestConfig,
-  Method,
-  AxiosInterceptorManager,
+  AxiosPromise,
   AxiosResponse,
-  RejectedFn,
-  ResolvedFn
+  Method,
+  ResolvedFn,
+  RejectedFn
 } from '../types'
 import dispatchRequest from './dispatchRequest'
 import InterceptorManager from './InterceptorManager'
@@ -23,11 +22,10 @@ interface PromiseChain<T> {
 
 export default class Axios {
   defaults: AxiosRequestConfig
-
   interceptors: Interceptors
 
-  constructor(initconfig: AxiosRequestConfig) {
-    this.defaults = initconfig
+  constructor(initConfig: AxiosRequestConfig) {
+    this.defaults = initConfig
     this.interceptors = {
       request: new InterceptorManager<AxiosRequestConfig>(),
       response: new InterceptorManager<AxiosResponse>()
@@ -46,6 +44,7 @@ export default class Axios {
     }
 
     config = mergeConfig(this.defaults, config)
+    config.method = config.method.toLowerCase()
 
     // 实现链式调用
     const chain: PromiseChain<any>[] = [
@@ -74,19 +73,19 @@ export default class Axios {
   }
 
   get(url: string, config?: AxiosRequestConfig): AxiosPromise {
-    return this._requestMethodWithOutData('get', url, config)
+    return this._requestMethodWithoutData('get', url, config)
   }
 
   delete(url: string, config?: AxiosRequestConfig): AxiosPromise {
-    return this._requestMethodWithOutData('delete', url, config)
+    return this._requestMethodWithoutData('delete', url, config)
   }
 
   head(url: string, config?: AxiosRequestConfig): AxiosPromise {
-    return this._requestMethodWithOutData('head', url, config)
+    return this._requestMethodWithoutData('head', url, config)
   }
 
   options(url: string, config?: AxiosRequestConfig): AxiosPromise {
-    return this._requestMethodWithOutData('options', url, config)
+    return this._requestMethodWithoutData('options', url, config)
   }
 
   post(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise {
@@ -101,7 +100,11 @@ export default class Axios {
     return this._requestMethodWithData('patch', url, data, config)
   }
 
-  _requestMethodWithOutData(method: Method, url: string, config?: AxiosRequestConfig) {
+  _requestMethodWithoutData(
+    method: Method,
+    url: string,
+    config?: AxiosRequestConfig
+  ): AxiosPromise {
     return this.request(
       Object.assign(config || {}, {
         method,
@@ -110,7 +113,12 @@ export default class Axios {
     )
   }
 
-  _requestMethodWithData(method: Method, url: string, data?: any, config?: AxiosRequestConfig) {
+  _requestMethodWithData(
+    method: Method,
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): AxiosPromise {
     return this.request(
       Object.assign(config || {}, {
         method,

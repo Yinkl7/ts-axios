@@ -12,7 +12,7 @@ export function transformResponse(data: any): any {
     try {
       // 字符串类型不一定是字符串类型
       data = JSON.parse(data)
-    } catch (error) {
+    } catch (e) {
       // do nothing
     }
   }

@@ -1,5 +1,3 @@
-import { type } from 'os'
-
 // 项目下类型的公共文件
 export type Method =
   | 'get'
@@ -27,6 +25,8 @@ export interface AxiosRequestConfig {
   // 相应类型定义
   responseType?: XMLHttpRequestResponseType
   timeout?: number
+  transformRequest?: AxiosTransformer | AxiosTransformer[]
+  transformResponse?: AxiosTransformer | AxiosTransformer[]
 
   [propName: string]: any
 }
@@ -41,17 +41,17 @@ export interface AxiosResponse<T = any> {
   request: any
 }
 
-// 异常类型定义
-export interface AxiosError {
-  isAxiosError: boolean
-  config: AxiosRequestConfig
-  code?: string | null
-  request?: any
-  response?: AxiosResponse
-}
-
 // Promise<T> T是什么类型 resolve函数的参数就是什么类型
 export interface AxiosPromise<T = any> extends Promise<AxiosResponse<T>> {}
+
+// 异常类型定义
+export interface AxiosError extends Error {
+  config: AxiosRequestConfig
+  code?: string
+  request?: any
+  response?: AxiosResponse
+  isAxiosError: boolean
+}
 
 export interface Axios {
   defaults: AxiosRequestConfig
@@ -88,7 +88,7 @@ export interface AxiosInstance extends Axios {
 export interface AxiosInterceptorManager<T> {
   // 添加拦截器
   use(resolved: ResolvedFn<T>, rejected?: RejectedFn): number
-  // 去除一个拦截器
+  // 根据id去除拦截器
   eject(id: number): void
 }
 
@@ -97,5 +97,9 @@ export interface ResolvedFn<T> {
 }
 
 export interface RejectedFn {
-  (err: any): any
+  (error: any): any
+}
+
+export interface AxiosTransformer {
+  (data: any, headers?: any): any
 }

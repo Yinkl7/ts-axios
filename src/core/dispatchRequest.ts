@@ -1,8 +1,8 @@
-import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from '../types'
+import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from '../types'
 import xhr from './xhr'
-import { bulidURL } from '../helpers/url'
-import { transformRequest, transformResponse } from '../helpers/data'
-import { processHeaders, flattenHeaders } from '../helpers/header'
+import { buildURL } from '../helpers/url'
+import { flattenHeaders } from '../helpers/header'
+import transform from './transform'
 
 // 生成一个request
 export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromise {
@@ -15,34 +15,21 @@ export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromis
 // 处理config
 function processConfig(config: AxiosRequestConfig): void {
   // 根据params对url进行拼接处理
-  config.url = transformUrl(config)
-  // 头对象处理
-  config.headers = transformHeader(config)
-  // 对请求时传递的参数进行处理
-  config.data = transformRequestData(config)
+  config.url = transformURL(config)
+  // 通过config.transformRequest的函数对 headers和data进行处理
+  config.data = transform(config.data, config.headers, config.transformRequest)
 
   config.headers = flattenHeaders(config.headers, config.method!)
 }
 
 // 处理url
-function transformUrl(config: AxiosRequestConfig): string {
-  const { url, params } = config
-  return bulidURL(url!, params)
+export function transformURL(config: AxiosRequestConfig): string {
+  let { url, params } = config
+  return buildURL(url!, params)
 }
 
-// 处理data
-function transformRequestData(config: AxiosRequestConfig): any {
-  const { data } = config
-  return transformRequest(data)
-}
-
-// 处理headers
-function transformHeader(config: AxiosRequestConfig) {
-  const { headers = {}, data } = config
-  return processHeaders(headers, data)
-}
-
+// 相应数据的处理
 function transformResponseData(res: AxiosResponse): AxiosResponse {
-  res.data = transformResponse(res.data)
+  res.data = transform(res.data, res.headers, res.config.transformResponse)
   return res
 }

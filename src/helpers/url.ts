@@ -11,7 +11,7 @@ function encode(val: string): string {
     .replace(/%5D/gi, ']')
 }
 
-export function bulidURL(url: string, params?: any): string {
+export function buildURL(url: string, params?: any): string {
   if (!params) {
     return url
   }
@@ -20,20 +20,17 @@ export function bulidURL(url: string, params?: any): string {
 
   Object.keys(params).forEach(key => {
     const val = params[key]
-    if (val === null && val === 'undefined') {
+    if (val === null || typeof val === 'undefined') {
       // 结束当前的这次循环，进入下一个循环
       return
     }
-
-    let values: string[]
-
+    let values = []
     if (Array.isArray(val)) {
       values = val
       key += '[]'
     } else {
       values = [val]
     }
-
     values.forEach(val => {
       if (isDate(val)) {
         val = val.toISOString()
@@ -48,7 +45,7 @@ export function bulidURL(url: string, params?: any): string {
 
   if (serializedParams) {
     // hash判断
-    let markIndex = url.indexOf('#')
+    const markIndex = url.indexOf('#')
     if (markIndex !== -1) {
       url = url.slice(0, markIndex)
     }
